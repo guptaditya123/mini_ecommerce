@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './config/db.js';
 import imgRoutes from './routes/imgRoutes.js';
+import productRoutes from './routes/productRecord.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.listen(PORT,()=>{
 connectDb();
 
 app.use('/api/products',imgRoutes);
+app.use('/api/allProducts',productRoutes);
 
 app.get('/',(req,res)=>{
     res.send('Hello World!');
