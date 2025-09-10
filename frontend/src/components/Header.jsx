@@ -11,6 +11,7 @@ const Header = () => {
 
         </div>
         <div className='flex gap-8 text-lg font-semibold'>
+          <Link to="/">Home</Link>
             <Link to="/product">Product</Link>
             <Link to="/cart" className='flex gap-1 '>Cart 
             <p className='text-sm font-semibold text-red-400'>{count}</p>
