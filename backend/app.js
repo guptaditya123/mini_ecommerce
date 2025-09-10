@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import connectDb from './config/db.js';
 import imgRoutes from './routes/imgRoutes.js';
 import productRoutes from './routes/productRecord.js';
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -19,6 +21,11 @@ app.listen(PORT,()=>{
 })
 
 connectDb();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 app.use('/api/products',imgRoutes);
 app.use('/api/allProducts',productRoutes);

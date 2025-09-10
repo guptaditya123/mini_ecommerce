@@ -7,13 +7,14 @@ export const uploadProduct = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const { productName, brandName, price } = req.body;
+    const { name, brand, price, quantity } = req.body;
     const imageUrl = `/uploads/${req.file.filename}`; // ✅ relative path
 
     const newProduct = new Product({
-      name: productName,
-      brand: brandName,
-      price: price,
+      name,
+      brand,
+      price,
+      quantity,
       image: imageUrl,
     });
 
