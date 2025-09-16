@@ -3,74 +3,114 @@ import { useCart } from "../context/cartContext";
 import API from "../api";
 
 const Cart = () => {
-  const { cartItems ,quantity , incQuantity , decQuantity } = useCart();
-  console.log(cartItems);
+  const { cartItems, incQuantity, decQuantity } = useCart();
   const [cartData, setCartData] = useState([]);
 
+  console.log("🧺 cartItems from context:", cartItems);
+
   useEffect(() => {
-    // This will run only once when the component mounts
     const fetchCartItems = async () => {
+      console.log("📡 Sending cart payload:", cartItems);
       try {
-        const res = await API.post("/allProducts/cartItems", { cartItems }); // Adjust the endpoint as needed
-        // Assuming the response contains the cart items
+        const res = await API.post("/allProducts/cartItems", {
+          cartItems: cartItems.map((item) => ({
+            _id: item._id,
+            quantity: item.quantity,
+          })),
+        });
+        console.log("✅ Backend cart response:", res.data);
         setCartData(res.data);
-        console.log(res.data);
-        console.log(res);
       } catch (err) {
-        console.log(err);
-        alert("Error fetching cart items", err);
+        console.error("❌ Error fetching cart items:", err);
       }
     };
-    fetchCartItems();
-  }, []); // Empty dependency array ensures this runs only once
+
+    if (cartItems.length > 0) {
+      fetchCartItems();
+    } else {
+      console.log("⚠️ No cart items to send");
+    }
+  }, [cartItems]);
+
+  const totalAmount = cartData.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 shadow-lg  w-[80%] flex flex-col mx-auto mt-10 p-4 rounded">
-      <h1 className="text-3xl font-bold text-center my-8">Cart Page</h1>
-      <div>
-        {/* Cart items will be displayed here */}
-        {cartItems.length === 0 ? (
-          <p className="text-center text-xl">Your cart is empty</p>
+    <div className="min-h-screen bg-gray-100 py-10">
+      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold mb-8 text-center">🛒 Your Cart</h1>
+
+        {cartData.length === 0 ? (
+          <p className="text-center text-lg text-gray-500">
+            Your cart is empty.
+          </p>
         ) : (
-          <ul className="max-w-2xl mx-auto space-y-4">
-            {cartData.map((item, index) => (
-              <li
-                key={index}
-                className="border p-4 justify-between  rounded-lg shadow-md flex items-center gap-4"
+          <div className="space-y-6">
+            {cartData.map((item) => (
+              <div
+                key={item._id}
+                className="flex items-center justify-between border rounded-lg p-4 shadow-sm"
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={item.image}
-                    alt="img not found"
+                    src={`http://localhost:4000${item.image}`}
+                    alt={item.name}
                     className="w-24 h-24 object-cover rounded"
                   />
-                  <div className="flex flex-col">
-
-                  <h2 className="text-xl font-semibold">{item.name}</h2>
-                  <p className="text-gray-600">Brand: {item.brand}</p>
-                  <p className="text-gray-600">Price: ${item.price}</p>
+                  <div>
+                    <h2 className="text-xl font-semibold">{item.name}</h2>
+                    <p className="text-gray-500 text-sm">{item.brand}</p>
+                    <p className="text-gray-700 font-medium">
+                      ${item.price.toFixed(2)}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <h2 className=" font-bold">
-                    Quantity
-                  </h2>
-                  <div className="flex gap-4 items-center cursor-pointer">
-                  <p className="text-2xl font-bold" onClick={()=>decQuantity(quantity)}> -</p>
-                  <p className="text-center text-xl">{quantity}</p>
-                  <p className="text-2xl font-bold cursor-pointer"onClick={()=>incQuantity(quantity)} > +</p>
+                  <p className="text-sm font-medium mb-2">Quantity</p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => decQuantity(item._id)}
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      -
+                    </button>
+                    <span className="text-lg font-semibold">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => incQuantity(item._id)}
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
 
-                {/* price */}
-                <div>
-                  <h2 className=" font-bold">Total Price</h2>
-                  <p className="text-center text-xl">${item.price * quantity}</p>
-                </div>  
-              </li>
+                <div className="text-right">
+                  <p className="text-sm text-gray-500">Total</p>
+                  <p className="text-lg font-bold">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
+              </div>
             ))}
-          </ul>
+
+            {/* Cart summary */}
+            <div className="flex justify-end pt-6 border-t">
+              <div className="text-right">
+                <p className="text-gray-600">Subtotal</p>
+                <p className="text-2xl font-bold">
+                  ${totalAmount.toFixed(2)}
+                </p>
+                <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  Checkout
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
