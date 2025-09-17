@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/cartContext'
 
 const Header = () => {
-  const {count} = useCart();
+  const { count } = useCart()
   return (
     <div className='flex justify-around p-4 bg-white shadow-md '>
         <div>

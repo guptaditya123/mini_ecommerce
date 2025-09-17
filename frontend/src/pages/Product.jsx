@@ -40,6 +40,7 @@ const Product = () => {
               onClick={() => addToCart(product)}
             >
               Add To Cart
+              
             </button>
           </div>
         ))}

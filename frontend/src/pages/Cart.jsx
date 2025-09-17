@@ -3,7 +3,7 @@ import { useCart } from "../context/cartContext";
 import API from "../api";
 
 const Cart = () => {
-  const { cartItems, incQuantity, decQuantity } = useCart();
+  const { cartItems, incQuantity, decQuantity, removeFromCart } = useCart();
   const [cartData, setCartData] = useState([]);
 
   console.log("🧺 cartItems from context:", cartItems);
@@ -20,6 +20,7 @@ const Cart = () => {
         });
         console.log("✅ Backend cart response:", res.data);
         setCartData(res.data);
+        localStorage.setItem("cartData", JSON.stringify(res.data));
       } catch (err) {
         console.error("❌ Error fetching cart items:", err);
       }
@@ -29,6 +30,8 @@ const Cart = () => {
       fetchCartItems();
     } else {
       console.log("⚠️ No cart items to send");
+      const storedCart = localStorage.getItem("cartData");
+      setCartData(storedCart ? JSON.parse(storedCart) : []);
     }
   }, [cartItems]);
 
@@ -86,6 +89,17 @@ const Cart = () => {
                     >
                       +
                     </button>
+                    <button
+                      onClick={() => {
+                        removeFromCart(item._id);
+                        setCartData((prev) =>
+                          prev.filter((i) => i._id !== item._id)
+                        );
+                      }}
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
 
@@ -102,9 +116,7 @@ const Cart = () => {
             <div className="flex justify-end pt-6 border-t">
               <div className="text-right">
                 <p className="text-gray-600">Subtotal</p>
-                <p className="text-2xl font-bold">
-                  ${totalAmount.toFixed(2)}
-                </p>
+                <p className="text-2xl font-bold">${totalAmount.toFixed(2)}</p>
                 <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                   Checkout
                 </button>
